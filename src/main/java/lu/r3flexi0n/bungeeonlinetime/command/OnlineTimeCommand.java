@@ -38,10 +38,11 @@ public class OnlineTimeCommand extends Command {
             ProxyServer.getInstance().getScheduler().runAsync(BungeeOnlineTime.instance, () -> {
                 try {
 
+                    String lastOnline = BungeeOnlineTime.mysql.getLastOnlineTime(player.getUniqueId()).toString();
                     int time = mysql.getOnlineTime(player.getUniqueId());
                     int hours = time / 60;
                     int minutes = time % 60;
-                    player.sendMessage(BungeeOnlineTime.onlineTime.replace("%DATE%", BungeeOnlineTime.lastReset).replace("%PLAYER%", player.getName()).replace("%HOURS%", String.valueOf(hours)).replace("%MINUTES%", String.valueOf(minutes)));
+                    player.sendMessage(BungeeOnlineTime.onlineTime.replace("%DATE%", BungeeOnlineTime.lastReset).replace("%PLAYER%", player.getName()).replace("%HOURS%", String.valueOf(hours)).replace("%MINUTES%", String.valueOf(minutes)).replace("%LAST%", lastOnline));
 
                 } catch (SQLException | ClassNotFoundException ex) {
                     player.sendMessage(BungeeOnlineTime.error);
@@ -169,8 +170,15 @@ public class OnlineTimeCommand extends Command {
                     int time = BungeeOnlineTime.mysql.getOnlineTime(uuid);
                     int hours = time / 60;
                     int minutes = time % 60;
-                    sender.sendMessage(BungeeOnlineTime.onlineTime.replace("%DATE%", BungeeOnlineTime.lastReset).replace("%PLAYER%", args[1]).replace("%HOURS%", String.valueOf(hours)).replace("%MINUTES%", String.valueOf(minutes)).replace("%LAST%", String.valueOf(lastOnline)));
 
+                    if (lastOnline.equals("1990-01-01 00:00:00.000000"))
+                    {
+                        sender.sendMessage(BungeeOnlineTime.neverOnline.replace("%PLAYER%", args[1]));
+                    }
+                    else
+                    {
+                        sender.sendMessage(BungeeOnlineTime.onlineTime.replace("%DATE%", BungeeOnlineTime.lastReset).replace("%PLAYER%", args[1]).replace("%HOURS%", String.valueOf(hours)).replace("%MINUTES%", String.valueOf(minutes)).replace("%LAST%", lastOnline));
+                    }
                 } catch (Exception ex) {
                     player.sendMessage(BungeeOnlineTime.error);
                 }

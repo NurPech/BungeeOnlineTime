@@ -73,8 +73,8 @@ public class MySQL {
 
         String sql = "SELECT lastonline FROM bungeeonlinetime WHERE uuid = '" + uuid + "';";
 
-        Calendar calendar = Calendar.getInstance();
-        java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(calendar.getTime().getTime());
+        String text = "1990-01-01 00:00:00.000000";
+        Timestamp sqlTimestamp = Timestamp.valueOf(text);
 
         if (isClosed()) {
             openConnection();
@@ -151,7 +151,7 @@ public class MySQL {
 
         Statement statement = connection.createStatement();
         for (UUID uuids : uuidList) {
-            statement.addBatch("INSERT INTO bungeeonlinetime (uuid, onlinetime, lastonline) VALUES ('" + uuids + "','1', " + sqlTimeStamp + " ) ON DUPLICATE KEY UPDATE onlinetime = onlinetime + 1, lastonline = " + sqlTimeStamp + ";");
+            statement.addBatch("INSERT INTO bungeeonlinetime (uuid, onlinetime, lastonline) VALUES ('" + uuids + "','1', '" + sqlTimeStamp + "' ) ON DUPLICATE KEY UPDATE onlinetime = onlinetime + 1, lastonline = '" + sqlTimeStamp + "';");
         }
         statement.executeBatch();
         statement.close();

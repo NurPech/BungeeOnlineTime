@@ -89,7 +89,7 @@ public class BungeeOnlineTime extends Plugin {
 
         addDefault(config, "Language.noPermission", "&7You do not have access to this command.");
         addDefault(config, "Language.playerNotFound", "&7The player '&6%PLAYER%&7' does not exist.");
-        addDefault(config, "Language.onlineTime", "&7Since &6%DATE%&7, &6%PLAYER% &7has been online for &6%HOURS% &7hours and &6%MINUTES% &7minutes.");
+        addDefault(config, "Language.onlineTime", "&7Since &6%DATE%&7, &6%PLAYER% &7has been online for &6%HOURS% &7hours and &6%MINUTES% &7minutes.  Last online &6%LAST%.");
         addDefault(config, "Language.resetDatabase", "&7The &6database &7has been &6reset&7.");
         addDefault(config, "Language.resetPlayer", "&6%PLAYER%&7s onlinetime has been &6reset&7.");
         addDefault(config, "Language.topWait", "&7The Top 10 is loading. Please wait...");

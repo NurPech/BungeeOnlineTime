@@ -1,12 +1,10 @@
 package lu.r3flexi0n.bungeeonlinetime.utils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.UUID;
+import java.util.Date;
 
 public class MySQL {
 
@@ -37,7 +35,7 @@ public class MySQL {
     }
 
     public void createTable() throws SQLException, ClassNotFoundException {
-        String sql = "CREATE TABLE IF NOT EXISTS bungeeonlinetime (uuid VARCHAR(36) UNIQUE, onlinetime INT);";
+        String sql = "CREATE TABLE IF NOT EXISTS bungeeonlinetime (uuid VARCHAR(36) UNIQUE, onlinetime INT, lastonline TIMESTAMP);";
 
         if (isClosed()) {
             openConnection();
@@ -69,6 +67,30 @@ public class MySQL {
         statement.close();
 
         return onlineTime;
+    }
+
+    public Timestamp getLastOnlineTime(UUID uuid) throws SQLException, ClassNotFoundException {
+
+        String sql = "SELECT lastonline FROM bungeeonlinetime WHERE uuid = '" + uuid + "';";
+
+        Calendar calendar = Calendar.getInstance();
+        java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(calendar.getTime().getTime());
+
+        if (isClosed()) {
+            openConnection();
+        }
+
+        Statement statement = getConnection().createStatement();
+
+        ResultSet resultset = statement.executeQuery(sql);
+        if (resultset.next()) {
+            sqlTimestamp = resultset.getTimestamp("lastonline");
+        }
+
+        resultset.close();
+        statement.close();
+
+        return sqlTimestamp;
     }
 
     public ArrayList<String> getTopOnlineTimes() throws SQLException, ClassNotFoundException {
@@ -124,9 +146,12 @@ public class MySQL {
             openConnection();
         }
 
+        Calendar calendar = Calendar.getInstance();
+        Timestamp sqlTimeStamp = new java.sql.Timestamp(calendar.getTime().getTime());
+
         Statement statement = connection.createStatement();
         for (UUID uuids : uuidList) {
-            statement.addBatch("INSERT INTO bungeeonlinetime (uuid, onlinetime) VALUES ('" + uuids + "','1') ON DUPLICATE KEY UPDATE onlinetime = onlinetime + 1;");
+            statement.addBatch("INSERT INTO bungeeonlinetime (uuid, onlinetime, lastonline) VALUES ('" + uuids + "','1', " + sqlTimeStamp + " ) ON DUPLICATE KEY UPDATE onlinetime = onlinetime + 1, lastonline = " + sqlTimeStamp + ";");
         }
         statement.executeBatch();
         statement.close();

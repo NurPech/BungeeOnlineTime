@@ -12,6 +12,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.config.Configuration;
 
+import static lu.r3flexi0n.bungeeonlinetime.BungeeOnlineTime.mysql;
+
 public class OnlineTimeCommand extends Command {
 
     public OnlineTimeCommand(String command, String permission, String... aliases) {
@@ -36,7 +38,7 @@ public class OnlineTimeCommand extends Command {
             ProxyServer.getInstance().getScheduler().runAsync(BungeeOnlineTime.instance, () -> {
                 try {
 
-                    int time = BungeeOnlineTime.mysql.getOnlineTime(player.getUniqueId());
+                    int time = mysql.getOnlineTime(player.getUniqueId());
                     int hours = time / 60;
                     int minutes = time % 60;
                     player.sendMessage(BungeeOnlineTime.onlineTime.replace("%DATE%", BungeeOnlineTime.lastReset).replace("%PLAYER%", player.getName()).replace("%HOURS%", String.valueOf(hours)).replace("%MINUTES%", String.valueOf(minutes)));
@@ -64,7 +66,7 @@ public class OnlineTimeCommand extends Command {
 
                     sender.sendMessage(BungeeOnlineTime.topWait);
 
-                    ArrayList<String> top10 = BungeeOnlineTime.mysql.getTopOnlineTimes();
+                    ArrayList<String> top10 = mysql.getTopOnlineTimes();
                     String[] data;
                     UUID uuid;
                     int time;
@@ -109,7 +111,7 @@ public class OnlineTimeCommand extends Command {
             ProxyServer.getInstance().getScheduler().runAsync(BungeeOnlineTime.instance, () -> {
                 try {
 
-                    BungeeOnlineTime.mysql.resetOnlineTimes();
+                    mysql.resetOnlineTimes();
                     BungeeOnlineTime.lastReset = Utils.getDate();
                     Configuration config = BungeeOnlineTime.configurationProvider.load(BungeeOnlineTime.configFile);
                     config.set("lastReset", BungeeOnlineTime.lastReset);
@@ -138,7 +140,7 @@ public class OnlineTimeCommand extends Command {
                 try {
 
                     UUID uuid = Utils.getUUID(args[1]);
-                    BungeeOnlineTime.mysql.resetOnlineTime(uuid);
+                    mysql.resetOnlineTime(uuid);
                     sender.sendMessage(BungeeOnlineTime.resetPlayer.replace("%PLAYER%", args[1]));
 
                 } catch (Exception ex) {
@@ -163,11 +165,11 @@ public class OnlineTimeCommand extends Command {
                 try {
 
                     UUID uuid = Utils.getUUID(args[1]);
-
+                    String lastOnline = BungeeOnlineTime.mysql.getLastOnlineTime(uuid).toString();
                     int time = BungeeOnlineTime.mysql.getOnlineTime(uuid);
                     int hours = time / 60;
                     int minutes = time % 60;
-                    sender.sendMessage(BungeeOnlineTime.onlineTime.replace("%DATE%", BungeeOnlineTime.lastReset).replace("%PLAYER%", args[1]).replace("%HOURS%", String.valueOf(hours)).replace("%MINUTES%", String.valueOf(minutes)));
+                    sender.sendMessage(BungeeOnlineTime.onlineTime.replace("%DATE%", BungeeOnlineTime.lastReset).replace("%PLAYER%", args[1]).replace("%HOURS%", String.valueOf(hours)).replace("%MINUTES%", String.valueOf(minutes)).replace("%LAST%", String.valueOf(lastOnline)));
 
                 } catch (Exception ex) {
                     player.sendMessage(BungeeOnlineTime.error);
